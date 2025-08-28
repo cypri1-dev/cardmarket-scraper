@@ -5,7 +5,7 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
-## [v1.0.0] - 2025-08-27
+## [v0.1.0] - 2025-08-27
 ### Ajouté
 - Version initiale du scraper 🎉
 - Recherche simple par URL.
@@ -14,7 +14,7 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
-## [v1.1.0] - 2025-08-28
+## [v0.2.0] - 2025-08-28
 ### Ajouté
 - Sélection de la langue des offres (FR 🇫🇷, EN 🇬🇧, DE 🇩🇪).
 - Vérification des URLs via regex (pas de filtres autorisés).
