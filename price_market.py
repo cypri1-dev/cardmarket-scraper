@@ -7,11 +7,27 @@ import re
 import numpy as np
 import os
 
+def url_valide(url: str) -> bool:
+    # Vérifie que l’URL ne contient pas de "?" ou "&"
+    pattern = r"^https:\/\/www\.cardmarket\.com\/[a-z]{2}\/Magic\/Products\/Singles\/[A-Za-z0-9\-\_\/]+$"
+    return re.match(pattern, url) is not None
+
+
 def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def afficher_prix_ligne_par_ligne(url_produit):
+def afficher_prix_ligne_par_ligne(url_produit, lang):
+
+    language = ""
+    if lang == "1":
+        language = "FR"
+    elif lang == "2":
+        language = "EN"
+    elif lang == "3":
+        language = "DE"
+
+
     options = Options()
     options.add_argument("--start-maximized")
     # options.add_argument("--headless")  # garder visible pour que JS charge bien
@@ -49,7 +65,7 @@ def afficher_prix_ligne_par_ligne(url_produit):
             return
 
         prix_list = []
-        print("\n🔥 Prix des offres FR :\n")
+        print(f"\n🔥 Prix des offres {language} :\n")
         for i, ligne in enumerate(lignes, start=1):
             try:
                 prix_text = ligne.find_element(By.CSS_SELECTOR, "div.col-offer.col-auto").text.strip()
@@ -62,7 +78,7 @@ def afficher_prix_ligne_par_ligne(url_produit):
 
         if prix_list:
             moyenne = sum(prix_list) / len(prix_list)
-            print(f"\n⭐ Moyenne des offres FR : {moyenne:.2f} €")
+            print(f"\n⭐ Moyenne des offres {language} : {moyenne:.2f} €")
 
             # Prix conseillé (20-80 percentile pour éviter extrêmes)
             bas, haut = np.percentile(prix_list, [20, 80])
@@ -92,8 +108,33 @@ def menu():
         choix = input("👉 Choisissez une option (1-2) : ").strip()
 
         if choix == "1":
-            url = input("\n🔗 Entrez l'URL de la page produit : ").strip()
-            afficher_prix_ligne_par_ligne(url)
+            print("\n🔗 Merci de saisir l'URL du produit SANS filtre (pas de '?language=2' etc.)")
+            print("   Exemple attendu : https://www.cardmarket.com/fr/Magic/Products/Singles/The-Lord-of-the-Rings-Tales-of-Middle-earth/Nazgul\n")
+            url = input("👉 Entrez l'URL du produit : ").strip()
+
+            if not url_valide(url):
+                print("\n⚠️  L’URL contient des filtres ou n’est pas valide !")
+                print("👉 Exemple attendu : https://www.cardmarket.com/fr/Magic/Products/Singles/The-Lord-of-the-Rings-Tales-of-Middle-earth/Nazgul\n")
+                input("🔁 Appuyez sur Entrée pour réessayer...")
+                continue
+
+            print("\n🌐 Choisissez la langue des offres :")
+            print("   1️⃣  🇫🇷  Français")
+            print("   2️⃣  🇬🇧  Anglais")
+            print("   3️⃣  🇩🇪  Allemand")
+            lang = input("\n👉 Entrez le numéro de la langue : ").strip()
+
+            if lang == "1":
+                url += "?language=2"
+            elif lang == "2":
+                url += "?language=1"
+            elif lang == "3":
+                url += "?language=3"
+            else:
+                print("\n⚠️ Langue invalide, utilisation par défaut : Français 🇫🇷")
+                url += "?language=2"
+
+            afficher_prix_ligne_par_ligne(url, lang)
             input("\n🔁 Appuyez sur Entrée pour revenir au menu...")
         elif choix == "2":
             print("\n👋 Merci d'avoir utilisé le scraper, à bientôt !")
