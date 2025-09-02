@@ -12,9 +12,9 @@ import time
 
 # ------------------------------------------ PARSING INPUT - REGEX ------------------------------------------ #
 
-def url_valide(url: str) -> bool:
+def url_valide(url: str, pattern: str) -> bool:
     # Vérifie que l’URL ne contient pas de "?" ou "&"
-    pattern = r"^https:\/\/www\.cardmarket\.com\/[a-z]{2}\/Magic\/Products\/Singles\/[A-Za-z0-9\-\_\/]+$"
+    pattern = rf"^https:\/\/www\.cardmarket\.com\/[a-z]{{2}}\/{pattern}\/Products\/Singles\/[A-Za-z0-9\-\_\/]+$"
     return re.match(pattern, url) is not None
 
 # ------------------------------------------ CLEAR TERMINAL ------------------------------------------ #
@@ -198,50 +198,93 @@ def scraper(url_produit, lang):
 # ------------------------------------------ MENU PRINCIPAL ------------------------------------------ #
 
 def menu():
+    clear_terminal()
+
     while True:
-        clear_terminal()
         print("\n🎴================================🎴")
         print("         \033[1;36mCARDMARKET SCRAPER\033[0m")
         print("🎴================================🎴\n")
-        print("1️⃣  🔍  Chercher une carte par URL")
-        print("2️⃣  🚪  Quitter\n")
+        print("1️⃣  🐉  Pokemon")
+        print("2️⃣  ✨  Magic")
+        print("3️⃣  🔮  Yu-Gi-Oh!")
+        print("4️⃣  🚪  Quitter\n")
         print("🎴================================🎴")
+        
+        choix_pattern = input("👉 Choisissez une option (1-2-3-4) : ").strip()
+        pattern = ""
+        title = ""
 
-        choix = input("👉 Choisissez une option (1-2) : ").strip()
-
-        if choix == "1":
-            print("\n🔗 Merci de saisir l'URL du produit SANS filtre (pas de '?language=2' etc.)")
-            print("   Exemple attendu : https://www.cardmarket.com/fr/Magic/Products/Singles/The-Lord-of-the-Rings-Tales-of-Middle-earth/Nazgul\n")
-            url = input("👉 Entrez l'URL du produit : ").strip()
-
-            if not url_valide(url):
-                print("\n⚠️  L’URL contient des filtres ou n’est pas valide !")
-                input("🔁 Appuyez sur Entrée pour réessayer...")
+        match choix_pattern:
+            case "1":
+                title = "POKEMON"
+                pattern = "Pokemon"
+            case "2":
+                title = "MAGIC"
+                pattern = "Magic"
+            case "3":
+                title = "YU-GI-OH!"
+                pattern = "YuGiOh"
+            case "4":
+                print("\n👋 Merci d'avoir utilisé le scraper, à bientôt !")
+                break
+            case _:
+                clear_terminal()
+                print("\n⚠️  Option invalide, veuillez réessayer.")
                 continue
 
-            print("\n🌐 Choisissez la langue des offres :")
-            print("   1️⃣  🇫🇷  Français")
-            print("   2️⃣  🇬🇧  Anglais")
-            print("   3️⃣  🇩🇪  Allemand")
-            lang = input("\n👉 Entrez le numéro de la langue : ").strip()
+        while True:
+            clear_terminal()
+            print(f"\n🎴=============== {title} ===============🎴\n")
+            print("1️⃣  Rechercher une carte par URL")
+            print("2️⃣  Rechercher une carte par nom (a venir...)\n")
+            print("3️⃣  Retour\n")
+            print("🎴================================🎴")
 
-            if lang == "1":
-                url += "?language=2"
-            elif lang == "2":
-                url += "?language=1"
-            elif lang == "3":
-                url += "?language=3"
-            else:
-                print("\n⚠️ Langue invalide, utilisation par défaut : Français 🇫🇷")
-                url += "?language=2"
+            choix = input("👉 Choisissez une option (1-2-3) : ").strip()
 
-            scraper(url, lang)
-            input("\n🔁 Appuyez sur Entrée pour revenir au menu...")
-        elif choix == "2":
-            print("\n👋 Merci d'avoir utilisé le scraper, à bientôt !")
-            break
-        else:
-            print("\n⚠️  Option invalide, veuillez réessayer.\n")
+            match choix:
+                case "1":
+                    print("\n🔗 Merci de saisir l'URL du produit SANS filtre (pas de '?language=2' etc.)")
+                    print(f"   Exemple attendu : https://www.cardmarket.com/fr/{pattern}/Products/Singles/extension/nom_de_la_carte\n")
+                    url = input("👉 Entrez l'URL du produit : ").strip()
+
+                    if not url_valide(url, pattern):
+                        print("\n⚠️  L’URL contient des filtres ou n’est pas valide !")
+                        input("🔁 Appuyez sur Entrée pour réessayer...")
+                        continue  # reste dans le menu secondaire
+
+                    print("\n🌐 Choisissez la langue des offres :")
+                    print("   1️⃣  🇫🇷  Français")
+                    print("   2️⃣  🇬🇧  Anglais")
+                    print("   3️⃣  🇩🇪  Allemand")
+                    lang = input("\n👉 Entrez le numéro de la langue : ").strip()
+
+                    match lang:
+                        case "1":
+                            url += "?language=2"
+                        case "2":
+                            url += "?language=1"
+                        case "3":
+                            url += "?language=3"
+                        case _:
+                            print("\n⚠️ Langue invalide, utilisation par défaut : Français 🇫🇷")
+                            url += "?language=2"
+
+                    scraper(url, lang)
+                    input("\n🔁 Appuyez sur Entrée pour revenir au menu secondaire...")
+
+                case "2":
+                    print("\nFonctionnalite a venir...")
+                    input("🔁 Appuyez sur Entrée pour revenir au menu secondaire...")
+
+                case "3":
+                    clear_terminal()
+                    break
+
+                case _:
+                    print("\n⚠️  Option invalide, veuillez réessayer.")
+                    input("🔁 Appuyez sur Entrée pour réessayer...")
+
 
 # ------------------------------------------------------------------------------------------------- #
 
