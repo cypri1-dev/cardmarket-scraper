@@ -1,7 +1,7 @@
 # 🎴 CardMarket Scraper
 
-Un petit outil en **Python** permettant de récupérer automatiquement les prix des cartes Magic: The Gathering sur [CardMarket](https://www.cardmarket.com/).  
-Il utilise **Selenium** et **BeautifulSoup** pour extraire les offres en français et calcule un prix conseillé.
+Un petit outil en **Python** permettant de récupérer automatiquement les prix des cartes Magic: The Gathering, Pokemon, Yu-Gi-Oh! sur [CardMarket](https://www.cardmarket.com/).  
+Il utilise **Selenium** pour extraire les offres en français et calcule un prix conseillé.
 
 ---
 
@@ -80,7 +80,6 @@ Extension : Le Seigneur des Anneaux : chroniques de la Terre du Milieu: Extras
 
 - Python 3.10+  
 - [Selenium](https://selenium.dev/)  
-- [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/)
 
 ---
 
