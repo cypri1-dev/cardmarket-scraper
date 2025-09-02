@@ -9,6 +9,7 @@ import re
 import numpy as np
 import os
 import time
+import sys
 
 # ------------------------------------------ PARSING INPUT - REGEX ------------------------------------------ #
 
@@ -44,16 +45,16 @@ def close_cookie_banner(driver):
 # ------------------------------------------ LOADING PART ------------------------------------------ #
 
 def load_all_offers(driver, max_cycles=40):
-    """
-    Scroll jusqu'en bas et clique sur 'Show more results' tant que possible.
-    """
     last_count = 0
     stagnant = 0
-    for _ in range(max_cycles):
+    spinner = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    spin_idx = 0
+
+    print("\n⏳ Chargement des offres...\n")
+    for cycle in range(max_cycles):
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(0.7)
 
-        # Tente de cliquer sur le bouton si visible
         try:
             btn = driver.find_element(By.ID, "loadMoreButton")
             style = (btn.get_attribute("style") or "").lower()
@@ -64,22 +65,26 @@ def load_all_offers(driver, max_cycles=40):
         except Exception:
             pass
 
-        # Compte les lignes actuellement chargées
         try:
             rows = driver.find_elements(By.CSS_SELECTOR, "div.table-body > div[id^='articleRow']")
             cur = len(rows)
-        except StaleElementReferenceException:
-            time.sleep(0.3)
-            rows = driver.find_elements(By.CSS_SELECTOR, "div.table-body > div[id^='articleRow']")
-            cur = len(rows)
+        except Exception:
+            cur = last_count
 
         if cur > last_count:
             last_count = cur
             stagnant = 0
         else:
             stagnant += 1
-            if stagnant >= 3:  # plus de nouveaux résultats après 3 cycles
+            if stagnant >= 3:
                 break
+
+        # Affichage spinner
+        sys.stdout.write(f"\r{spinner[spin_idx % len(spinner)]} Offres chargées : {last_count}")
+        sys.stdout.flush()
+        spin_idx += 1
+
+    print(f"\n✅ Offres finales chargées : {last_count}\n")
     return last_count
 
 # ------------------------------------------ EXTRACTION NAME + EXTENSION ------------------------------------------ #
@@ -167,9 +172,11 @@ def scraper(url_produit, lang):
         language = "DE"
 
     options = Options()
-    options.add_argument("--start-maximized")
+    options.add_argument("--window-size=1200,800") 
 
     driver = webdriver.Chrome(options=options)
+    driver.minimize_window()
+
     try:
         driver.get(url_produit)
         close_cookie_banner(driver)
